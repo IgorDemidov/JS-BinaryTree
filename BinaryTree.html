@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title></title>
+</head>
+<body>
+
+<script>
+
+  var Node = function(value){
+    this.value = value;
+    this.parent = null;
+    this.left = null;
+    this.right = null;
+  }
+
+  var BTree = function(){
+    this.rootNode = null;
+  }
+
+  BTree.prototype.Add = function(value){
+
+    if (isNaN(parseFloat(value)) && !isFinite(value)){
+      alert("Argument must be numeric!")
+    }
+
+    if (this.rootNode===null){
+      this.rootNode = new Node(value);
+      return true;
+    };
+
+    function findPosAndAdd(currNode){
+      if (value===currNode.value) {
+        return false;
+      };
+
+      if(value>currNode.value){
+        if(currNode.right===null){
+          currNode.right = new Node(value);
+          currNode.right.parent = currNode;
+        } else{
+          currNode = currNode.right;
+          return findPosAndAdd(currNode);
+        };
+      }else{
+         if(currNode.left===null){
+          currNode.left = new Node(value);
+          currNode.left.parent = currNode;
+        } else{
+          currNode = currNode.left;
+          return findPosAndAdd(currNode);
+        };
+      };
+      return true;
+    }
+    var currentNode = this.rootNode;
+    return findPosAndAdd(currentNode);
+  }
+
+  var bTree = new BTree();
+
+/*  For console pasting
+bTree.Add(5);
+bTree.Add(3);
+bTree.Add(4);
+bTree.Add(2);
+bTree.Add(8);
+bTree.Add(6);
+bTree.Add(10);
+
+bTree.Add(8);
+
+bTree.Add(NAN);
+*/
+
+</script>
+</body>
+
+
+</html>

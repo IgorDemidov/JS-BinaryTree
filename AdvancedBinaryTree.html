@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title></title>
+</head>
+<body>
+
+<script>
+
+  var Node = function(value){
+    this.value = value;
+    this.parent = null;
+    this.left = null;
+    this.right = null;
+    this.surrogate = null;
+    this.surrogateFor =null;
+  }
+
+  var BTree = function(){
+    this.rootNode = null;
+  }
+
+  BTree.prototype.Add = function(value){
+
+    if (isNaN(parseFloat(value)) && !isFinite(value)){
+      alert("Argument must be numeric!")
+    }
+    var newNode = new Node(value);
+
+    if (this.rootNode===null){
+      this.rootNode = newNode;
+      return true;
+    };
+
+    function findPosAndAdd(currNode){
+      if (value===currNode.value) {
+        return false;
+      };
+
+        if (currNode.value<newNode.value){
+          if (currNode.surrogate===null) {
+            currNode.surrogate=newNode;
+            newNode.surrogateFor = currNode;
+          }else{
+            if (currNode.surrogate.value>newNode.value){
+              currNode.surrogate.surrogateFor = null;
+              currNode.surrogate = newNode;
+              newNode.surrogateFor = currNode;
+            };
+          };
+        };
+
+      if(value>currNode.value){
+        if(currNode.right===null){
+          currNode.right = newNode;
+          currNode.right.parent = currNode;
+        } else{
+          currNode = currNode.right;
+          return findPosAndAdd(currNode);
+        };
+      }else{
+         if(currNode.left===null){
+          currNode.left = newNode;
+          currNode.left.parent = currNode;
+        } else{
+          currNode = currNode.left;
+          return findPosAndAdd(currNode);
+        };
+      };
+      return true;
+    }
+    var currentNode = this.rootNode;
+    return findPosAndAdd(currentNode);
+  }
+
+  var AdvancedBTree = function(){
+  };
+
+  AdvancedBTree.prototype = new BTree();
+
+  AdvancedBTree.prototype.Remove = function(value){
+
+    var tempRoot = this.rootNode;
+
+    function findTargetNode(){
+      if (tempRoot==null) {
+        return null;
+      };
+      if (value===tempRoot.value){
+        return tempRoot;
+      };
+      if (value>tempRoot.value){
+        tempRoot=tempRoot.right;
+      } else {
+        tempRoot=tempRoot.left;
+      };
+
+      return findTargetNode();
+    }
+
+    var targetNode = findTargetNode();
+    if (targetNode===null){
+      return false;
+    };
+
+    if (targetNode.surrogate!==null) {
+      if (targetNode.surrogateFor!==null)
+      {
+        targetNode.surrogateFor.surrogate = targetNode.surrogate;
+        targetNode.surrogate.surrogateFor = targetNode.surrogateFor;
+      }else{
+        targetNode.surrogate.surrogateFor = targetNode.surrogateFor;
+      };
+    }else{
+      if (targetNode.surrogateFor!==null)
+      {
+        targetNode.surrogateFor.surrogate = targetNode.surrogate;
+      }else{
+        //may be nothing
+      };
+    };
+
+    var surrogateNode = targetNode.surrogate;
+
+    if (surrogateNode!==null){
+      if (surrogateNode.parent.left===surrogateNode){
+        surrogateNode.parent.left = surrogateNode.right;
+      }else{
+        surrogateNode.parent.right = surrogateNode.right;
+      };
+
+      if (surrogateNode.right!==null){
+          surrogateNode.right.parent = surrogateNode.parent;
+        };
+
+      surrogateNode.parent = targetNode.parent;
+      surrogateNode.left = targetNode.left;
+      surrogateNode.right = targetNode.right;
+
+      if (targetNode.parent!==null){
+        if (targetNode.parent.left===targetNode) {
+          targetNode.parent.left = surrogateNode;
+        } else {
+          targetNode.parent.right = surrogateNode;
+        };
+      } else{
+        this.rootNode = surrogateNode;
+      };
+    }else{
+      if (targetNode.parent!==null){
+        if (targetNode.parent.left===targetNode.left) {
+          targetNode.parent.left = targetNode.left;
+        } else {
+          targetNode.parent.right = targetNode.right;
+        };
+        if(targetNode.left!==null){
+          targetNode.left.parent=targetNode.parent;
+        };
+      } else{
+        this.rootNode = targetNode.left;
+      };
+    };
+
+    return true;
+
+  };
+
+  var bTree = new BTree();
+  var aBTree = new AdvancedBTree();
+
+/*  For console pasting
+bTree.Add(5);
+bTree.Add(3);
+bTree.Add(4);
+bTree.Add(2);
+bTree.Add(8);
+bTree.Add(6);
+bTree.Add(10);
+
+bTree.Add(8);
+
+bTree.Add(NAN);
+
+aBTree instanceof BTree
+
+aBTree.Add(5);
+aBTree.Add(3);
+aBTree.Add(4);
+aBTree.Add(2);
+aBTree.Add(8);
+aBTree.Add(6);
+aBTree.Add(10);
+
+aBTree.Remove(6);
+*/
+
+</script>
+</body>
+
+
+</html>
